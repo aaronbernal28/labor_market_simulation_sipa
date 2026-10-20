@@ -1,0 +1,134 @@
+paths:
+  data_raw: data/raw
+  data_processed: data/processed
+  data_graphs: data/graphs
+  images: images
+
+pipeline:
+  # Time range of the full dataset (YYYYMM)
+  start_period: 199601
+  end_period:   202112
+
+  # Width of each time batch (in months).  e.g. 12 = annual batches.
+  time_interval: 12
+
+  # Sector granularity: 1=letra | 2=r32 two-digit | 3=r32 first digit | 4=r34
+  granularity: 2
+
+  # Whether workers absent in the next batch route to an "unemployed" node
+  include_unemployment_node: false
+
+  # Weighting column (set to null to disable)
+  weight_column: null
+
+# ── Simulation parameters (scaffold — TBD) ─────────────────────────────────────
+simulation:
+  rate_fired: 0.02                    # monthly probability of job loss
+  rate_vacancies: 0.03                # monthly vacancy opening rate
+  initial_employed_fraction: 0.85
+  seed: 42
+  n_steps: 120                        # simulation horizon in months
+  # Additional parameters TBD
+
+datasets:
+  features:
+    - name: "sex_id"
+      type: "int"
+
+
+  sipa:
+    source: data/mler_csv.rar
+    url: "https://datasets.datos.mincyt.gob.ar/dataset/b0c0ae96-4028-4d0e-919a-c6830110f6b6/resource/421a7e29-7d15-4b69-a2e8-d7242b58b770/download/base_enespersonas.csv"
+    id_1: "nocues"
+    id_2: "nhog"
+    id_3: "miembro"
+
+# Translation for labels and features to be used in plots and tables.
+translation:
+  caeslabel: "Etiqueta CAES-01"
+  caesletra: "Letra CAES-01"
+  caesag: "Agrupacion CAES-01"
+  caeslabel_color: "Color etiqueta CAES-01"
+  caesletra_color: "Color letra CAES-01"
+  caesag_color: "Color agrupacion CAES-01"
+  ciuolabel: "Etiqueta CIUO-08"
+  ciuo1diglabel: "CIUO-08 1 digito"
+  ciuo3cat: "CIUO-08 3 categorias"
+  ciuolabel_color: "Color etiqueta CIUO-08"
+  ciuo1diglabel_color: "Color CIUO-08 1 digito"
+  ciuo3cat_color: "Color CIUO-08 3 categorias"
+  sex_id: "Sexo"
+  public_worker: "Trabajador/a publico"
+  total_income: "Ingreso total individual (log)"
+  age: "Edad"
+  nivel_ed: "Nivel educativo"
+  n_obs: "Cantidad de observaciones"
+  total_workers_weighted: "Trabajadores ponderados"
+  age_mean: "Edad media"
+  age_min: "Edad minima"
+  age_q1: "Edad P25"
+  age_median: "Edad mediana"
+  age_q3: "Edad P75"
+  age_max: "Edad maxima"
+  age_std: "Desvio estandar de edad"
+  income_mean: "Ingreso medio (log)"
+  income_min: "Ingreso minimo (log)"
+  income_q1: "Ingreso P25 (log)"
+  income_median: "Ingreso mediano (log)"
+  income_q3: "Ingreso P75 (log)"
+  income_max: "Ingreso maximo (log)"
+  income_std: "Desvio estandar de ingreso (log)"
+  female_pct: "Porcentaje de mujeres"
+  male_pct: "Porcentaje de varones"
+  mean_hours_worked: "Horas trabajadas (promedio)"
+  nivel_ed_mean: "Nivel educativo medio"
+  self_employed_pct: "Porcentaje de cuenta propia"
+  salaried_pct: "Porcentaje asalariado"
+  public_sector_pct: "Porcentaje sector publico"
+  region_1_pct: "Porcentaje region 1"
+  region_2_pct: "Porcentaje region 2"
+  region_3_pct: "Porcentaje region 3"
+  region_4_pct: "Porcentaje region 4"
+  region_5_pct: "Porcentaje region 5"
+  region_6_pct: "Porcentaje region 6"
+  region_7_pct: "Porcentaje region 7"
+  region_8_pct: "Porcentaje region 8"
+  node_count: "Cantidad de nodos"
+  edge_count: "Cantidad de aristas"
+  self_loops: "Autobucle"
+  density: "Densidad"
+  avg_degree: "Grado promedio"
+  avg_weighted_degree: "Grado ponderado promedio"
+  avg_clustering: "Coeficiente de clustering promedio"
+  avg_weighted_clustering: "Coeficiente de clustering ponderado promedio"
+  connected_components: "Componentes conectadas"
+  diameter: "Diametro"
+  bipartite_density: "Densidad bipartita"
+  degree_assortativity: "Asortatividad de grado"
+  degree_assortativity_weighted: "Asortatividad de grado ponderada"
+  lcc_size: "Tamano del mayor componente"
+  lcc_percent: "Porcentaje del mayor componente"
+  avg_path_length: "Longitud promedio de camino"
+  time_date: "Fecha"
+  pearson_r: "Correlación de Pearson"
+  alpha: "Alfa"
+  unfiltered: "Sin filtrar"
+  Year: "Año"
+  Dimension: "Dimensión"
+  Birth: "Nacimiento"
+  Death: "Muerte"
+  "Persistence diagrams": "Diagramas de persistencia"
+  "Persistence Diagram": "Diagrama de persistencia"
+  "Distance matrix d(u,v) (beta-index)": "Matriz de distancias d(u,v) (índice beta)"
+  "2-Simplex (Triangles)": "2-Simplices (Triángulos)"
+  "3-Simplex (Tetrahedra / 4-Cliques)": "3-Simplices (Tetraedros / 4-cliques)"
+  Other: "Otro"
+  community: "Comunidad"
+  "Betweenness centrality": "Centralidad de intermediación"
+  Workers : "Trabajadores"
+  reference resolution: "Resolución de referencia"
+  algorithm: "Algoritmo"
+  Resolution: "Resolución"
+  Communities: "Comunidades"
+  Modularity: "Modularidad"
+  negative values: "valores negativos"
