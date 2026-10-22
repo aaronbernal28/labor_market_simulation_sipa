@@ -1,10 +1,17 @@
-rule extract_raw:
-    """Unpack MLER RAR archive to data/raw/."""
+rule preprocess_mler:
+    """
+    Preprocess raw MLER CSV into year-partitioned Parquet files
+    and build the working-age worker registry.
+    """
     input:
-        archive=config["datasets"]["sipa"]["source"],
+        csv=config["datasets"]["sipa"]["source"],
     output:
-        csv="data/raw/mler.csv",
+        marker=touch(f"{config['paths']['data_parquet']}/.done"),
+        registry="data/processed/worker_registry.parquet",
+    params:
+        out_dir=config["paths"]["data_parquet"],
+        max_working_age=config["pipeline"]["max_working_age"],
     log:
-        "logs/extract_raw.log",
-    shell:
-        "unrar e {input.archive} data/raw/ > {log} 2>&1"
+        "logs/preprocess_mler.log",
+    script:
+        "../../scripts/preprocess_data.py"

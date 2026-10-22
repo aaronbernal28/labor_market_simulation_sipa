@@ -1,6 +1,6 @@
 def _next_batch_bipartite(wildcards):
     """
-    Resolve the bipartite file for the *next* time batch (t+1),
+    Resolve the bipartite file for the next time batch (t+1),
     required to compute the transition matrix for batch t.
     """
     current_id = wildcards.batch
@@ -23,38 +23,23 @@ def _next_batch_bipartite(wildcards):
 
 rule compute_transition:
     """
-    Convert a bipartite occurrence matrix into an NxN sector transition
-    matrix.  Requires both the current batch and the next batch bipartite
-    files.
-
-    The core logic is delegated to BipartiteToTransition
-    (src/pipeline/transition_builder.py).  Its compute() method is
-    currently a PLACEHOLDER — user will supply real formula.
+    Compute the empirical (N+1) x (N+1) Hidalgo proximity / transition
+    matrix between consecutive batches t and t+1, including the
+    unemployment state s_0.
     """
     input:
         current="data/processed/{batch}/bipartite_g{gran}.parquet",
         next_b=_next_batch_bipartite,
+        registry="data/processed/worker_registry.parquet",
     output:
         matrix="data/processed/{batch}/transition_matrix_g{gran}.parquet",
+    params:
+        start=lambda wc: int(wc.batch.split("_")[0]),
+        end=lambda wc: int(wc.batch.split("_")[1]),
+        gran=lambda wc: int(wc.gran),
+        metric=config["pipeline"]["transition_metric"],
+        max_working_age=config["pipeline"]["max_working_age"],
     log:
         "logs/transition/{batch}_g{gran}.log",
     script:
         "../../scripts/compute_transition.py"
-
-
-rule aggregate_matrices:
-    """
-    Collect all per-batch transition matrices into a single
-    time-indexed Parquet series.
-    """
-    input:
-        matrices=expand(
-            "data/processed/{batch}/transition_matrix_g{{gran}}.parquet",
-            batch=TRANSITION_BATCHES,
-        ),
-    output:
-        series="data/results/transition_series_g{gran}.parquet",
-    log:
-        "logs/aggregate_g{gran}.log",
-    script:
-        "../../scripts/aggregate_matrices.py"

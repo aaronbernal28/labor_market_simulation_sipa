@@ -55,17 +55,17 @@ include: "workflow/rules/plots.smk"
 # ── Default target ─────────────────────────────────────────────────────────────
 rule all:
     input:
-        # Per-batch bipartite matrices
+        # Preprocessing registry
+        "data/processed/worker_registry.parquet",
+        # Per-batch bipartite worker states
         expand(
             "data/processed/{batch}/bipartite_g{gran}.parquet",
             batch=BATCHES,
             gran=GRANULARITY,
         ),
-        # Per-batch transition matrices (all except last batch)
+        # Per-batch Hidalgo proximity matrices (all except last batch)
         expand(
             "data/processed/{batch}/transition_matrix_g{gran}.parquet",
             batch=TRANSITION_BATCHES,
             gran=GRANULARITY,
         ),
-        # Aggregated transition series
-        f"data/results/transition_series_g{GRANULARITY}.parquet",

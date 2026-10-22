@@ -1,5 +1,6 @@
 paths:
-  data_raw: data/raw
+  data_raw: data
+  data_parquet: data/processed/mler_parquet
   data_processed: data/processed
   data_graphs: data/graphs
   images: images
@@ -16,10 +17,16 @@ pipeline:
   granularity: 2
 
   # Whether workers absent in the next batch route to an "unemployed" node
-  include_unemployment_node: false
+  include_unemployment_node: true
 
-  # Weighting column (set to null to disable)
-  weight_column: null
+  # Transition / proximity metric: "hidalgo" (default) or "row_stochastic"
+  transition_metric: "hidalgo"
+
+  # Maximum working age cutoff (workers older than this exit the active pool)
+  max_working_age: 65
+
+  # Weighting column (set to null to disable, or "pondera")
+  weight_column: "pondera"
 
 # ── Simulation parameters (scaffold — TBD) ─────────────────────────────────────
 simulation:
@@ -37,7 +44,7 @@ datasets:
 
 
   sipa:
-    source: data/mler_csv.rar
+    source: data/MLER.csv
     url: "https://datasets.datos.mincyt.gob.ar/dataset/b0c0ae96-4028-4d0e-919a-c6830110f6b6/resource/421a7e29-7d15-4b69-a2e8-d7242b58b770/download/base_enespersonas.csv"
     id_1: "nocues"
     id_2: "nhog"
