@@ -6,8 +6,6 @@ Loads the aggregated transition series and runs the ABM simulation.
 Full implementation TBD — currently produces a placeholder output.
 """
 
-from __future__ import annotations
-
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING

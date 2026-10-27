@@ -2,12 +2,10 @@
 Script: compute_transition.py
 Called by: workflow/rules/transition.smk -> rule compute_transition
 
-Loads two consecutive batch worker state files and the cumulative worker
-registry, filters to the working-age cumulative labor force up to t+1,
+Loads two period worker state files (start and end) and the cumulative worker
+registry, filters to the working-age cumulative labor force up to end,
 and computes the (N+1) x (N+1) Hidalgo proximity / transition matrix.
 """
-
-from __future__ import annotations
 
 import logging
 from pathlib import Path
@@ -34,31 +32,24 @@ logging.basicConfig(
 log: logging.Logger = logging.getLogger(__name__)
 
 
-def _infer_end_period_from_path(bipartite_path: str | Path) -> int:
-	"""Extract the end period YYYYMM from '.../{start}_{end}/bipartite_g{gran}.parquet'."""
-	batch_folder: str = Path(bipartite_path).parent.name
-	parts: list[str] = batch_folder.split("_")
-	return int(parts[1])
-
-
 def main() -> None:
 	current_path: str = str(snakemake.input.current)
 	next_path: str = str(snakemake.input.next_b)
 	registry_path: str = str(snakemake.input.registry)
 	out_path: str = str(snakemake.output.matrix)
 
+	t_start: int = int(snakemake.params.start)
+	t_end: int = int(snakemake.params.end)
 	metric: str = str(snakemake.params.metric)
 	max_working_age: int = int(snakemake.params.max_working_age)
 
-	t_end: int = _infer_end_period_from_path(current_path)
-	t1_end: int = _infer_end_period_from_path(next_path)
-	obs_year_t1: int = t1_end // 100
+	obs_year_end: int = t_end // 100
 
 	log.info(
 		"Computing %s matrix for transition (%d -> %d)",
 		metric,
+		t_start,
 		t_end,
-		t1_end,
 	)
 
 	states_t: pd.DataFrame = pd.read_parquet(current_path)
@@ -66,11 +57,11 @@ def main() -> None:
 	registry: pd.DataFrame = pd.read_parquet(registry_path)
 
 	# Filter cumulative labor force:
-	# 1. Entered formal market on or before t1_end (first_period <= t1_end)
-	# 2. Working age at t+1 (obs_year_t1 - fnacim <= max_working_age)
-	age_t1: pd.Series = obs_year_t1 - registry["fnacim"]
-	active_mask: pd.Series = (registry["first_period"] <= t1_end) & (
-		age_t1 <= max_working_age
+	# 1. Entered formal market on or before t_end (first_period <= t_end)
+	# 2. Working age at t_end (obs_year_end - fnacim <= max_working_age)
+	age_end: pd.Series = obs_year_end - registry["fnacim"]
+	active_mask: pd.Series = (registry["first_period"] <= t_end) & (
+		age_end <= max_working_age
 	)
 	active_universe: pd.DataFrame = registry.loc[
 		active_mask, ["id_trabajador", "pondera"]
@@ -78,7 +69,7 @@ def main() -> None:
 
 	log.info(
 		"Active working-age cumulative pool at %d: %d workers",
-		t1_end,
+		t_end,
 		len(active_universe),
 	)
 

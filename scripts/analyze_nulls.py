@@ -5,8 +5,6 @@ Analyzes missing/null values and distributions in data/MLER.csv,
 with a focus on fnacim (birth year) and worker demographics.
 """
 
-from __future__ import annotations
-
 import csv
 import sys
 from collections import defaultdict

@@ -7,8 +7,6 @@ writes year-partitioned Parquet files, and builds the worker registry
 (id_trabajador, first_period, fnacim, pondera).
 """
 
-from __future__ import annotations
-
 import logging
 import shutil
 from pathlib import Path

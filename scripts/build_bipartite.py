@@ -2,12 +2,10 @@
 Script: build_bipartite.py
 Called by: workflow/rules/bipartite.smk -> rule build_bipartite
 
-Loads the partitioned MLER Parquet slice at the batch end month (t_end),
+Loads the partitioned MLER Parquet slice at a given period (YYYYMM),
 applies working-age filtering and primary job selection (max rem_tot),
 and saves the resolved worker states to Parquet.
 """
-
-from __future__ import annotations
 
 import logging
 from pathlib import Path
@@ -38,27 +36,21 @@ log: logging.Logger = logging.getLogger(__name__)
 def main() -> None:
 	parquet_dir: str = str(snakemake.params.parquet_dir)
 	out_path: str = str(snakemake.output.matrix)
-	start: int = int(snakemake.params.start)
-	end: int = int(snakemake.params.end)
+	period: int = int(snakemake.params.period)
 	gran: int = int(snakemake.params.gran)
 	max_working_age: int = int(snakemake.params.max_working_age)
 
-	log.info(
-		"Loading MLER Parquet for batch [%d, %d] at observation month t_end=%d",
-		start,
-		end,
-		end,
-	)
+	log.info("Loading MLER Parquet at observation period=%d", period)
 	loader: MLERLoader = MLERLoader(parquet_dir)
-	df_end: pd.DataFrame = loader.load_period(end)
-	log.info("Loaded %d job relations at period %d", len(df_end), end)
+	df_period: pd.DataFrame = loader.load_period(period)
+	log.info("Loaded %d job relations at period %d", len(df_period), period)
 
-	sector_series: pd.Series = loader.get_sector_column(gran, df_end)
+	sector_series: pd.Series = loader.get_sector_column(gran, df_period)
 
 	builder: BipartiteBuilder = BipartiteBuilder(
-		df=df_end,
+		df=df_period,
 		granularity=gran,
-		target_period=end,
+		target_period=period,
 		max_working_age=max_working_age,
 	)
 	states_df: pd.DataFrame = builder.extract_worker_states(sector_series)
@@ -70,7 +62,7 @@ def main() -> None:
 
 	Path(out_path).parent.mkdir(parents=True, exist_ok=True)
 	states_df.to_parquet(out_path, index=False)
-	log.info("Saved batch worker states to %s", out_path)
+	log.info("Saved period worker states to %s", out_path)
 
 
 if __name__ == "__main__":
