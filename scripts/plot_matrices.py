@@ -6,33 +6,36 @@ Generates heatmap visualisations of transition matrices.
 Full implementation TBD.
 """
 
+from __future__ import annotations
+
 import logging
-import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 
-try:
-	_sm = snakemake
-except NameError:
-	_sm = None
+if TYPE_CHECKING:
+	from snakemake.script import Snakemake
 
-log_path = _sm.log[0] if _sm else "/dev/stderr"
+	snakemake: Snakemake
+
+log_path: str = (
+	snakemake.log[0] if hasattr(snakemake, "log") and snakemake.log else "/dev/stderr"
+)
+Path(log_path).parent.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
 	filename=log_path,
 	level=logging.INFO,
 	format="%(asctime)s [%(levelname)s] %(message)s",
 )
-log = logging.getLogger(__name__)
+log: logging.Logger = logging.getLogger(__name__)
 
 
-def main():
-	series_path = _sm.input.series if _sm else sys.argv[1]
-	out_dir = _sm.output.figures if _sm else sys.argv[2]
+def main() -> None:
+	series_path: str = str(snakemake.input.series)
+	out_dir: str = str(snakemake.output.figures)
 
 	log.info("Loading transition series from %s", series_path)
-	# TODO: load and iterate over batch-specific matrices
-
 	Path(out_dir).mkdir(parents=True, exist_ok=True)
 
 	# Placeholder: save a single summary figure
