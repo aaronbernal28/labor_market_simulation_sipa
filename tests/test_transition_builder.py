@@ -70,9 +70,7 @@ class TestTransitionBuilder(unittest.TestCase):
 		self.assertAlmostEqual(C.loc["10", "unemployed"], 1 * self.w, places=4)
 		self.assertAlmostEqual(C.loc["20", "20"], 1 * self.w, places=4)
 		self.assertAlmostEqual(C.loc["unemployed", "20"], 1 * self.w, places=4)
-		self.assertAlmostEqual(
-			C.loc["unemployed", "unemployed"], 1 * self.w, places=4
-		)
+		self.assertAlmostEqual(C.loc["unemployed", "unemployed"], 1 * self.w, places=4)
 
 	def test_hidalgo_proximity_equation(self):
 		builder = BipartiteToTransition(
@@ -103,9 +101,7 @@ class TestTransitionBuilder(unittest.TestCase):
 		# C('unemployed', 'unemployed') = 1 * w
 		# N_t('unemployed') = 2 * w, N_{t+1}('unemployed') = 2 * w -> max = 2 * w
 		# phi = 1 / 2
-		self.assertAlmostEqual(
-			Phi.loc["unemployed", "unemployed"], 0.5, places=6
-		)
+		self.assertAlmostEqual(Phi.loc["unemployed", "unemployed"], 0.5, places=6)
 
 	def test_row_stochastic_probabilities(self):
 		builder = BipartiteToTransition(
