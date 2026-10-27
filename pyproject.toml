@@ -14,6 +14,7 @@ dependencies = [
 	"mesa==3.5.1",
 	"networkx==3.7",
 	"numpy==2.5.4",
+	"openpyxl==3.1.5",
 	"pandas==3.1.0",
 	"pyarrow==26.0.0",
 	"python-dotenv==1.2.4",
