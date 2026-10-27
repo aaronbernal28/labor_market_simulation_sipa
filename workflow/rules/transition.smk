@@ -22,3 +22,21 @@ rule compute_transition:
 		"../envs/default.yaml"
 	script:
 		"../../scripts/compute_transition.py"
+
+
+rule export_transition_csv:
+	"""
+	Export a computed Parquet transition matrix to human-readable CSV with
+	official sector labels mapped from data/anexo_estadistico_y_descriptores.xlsx.
+	"""
+	input:
+		matrix="data/processed/{start}_{end}/transition_matrix_g{gran}.parquet",
+		descriptors="data/anexo_estadistico_y_descriptores.xlsx",
+	output:
+		csv="data/processed/{start}_{end}/transition_matrix_g{gran}.csv",
+	log:
+		"logs/transition/{start}_{end}_g{gran}_csv.log",
+	conda:
+		"../envs/default.yaml"
+	script:
+		"../../scripts/export_transition_csv.py"
