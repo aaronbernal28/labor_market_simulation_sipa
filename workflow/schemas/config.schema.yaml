@@ -1,0 +1,108 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: "Validation schema for labor_market_simulation_sipa configuration"
+type: object
+required:
+  - paths
+  - pipeline
+  - simulation
+  - datasets
+properties:
+  paths:
+    type: object
+    required:
+      - data_raw
+      - data_parquet
+      - data_processed
+      - data_graphs
+      - images
+    properties:
+      data_raw:
+        type: string
+      data_parquet:
+        type: string
+      data_processed:
+        type: string
+      data_graphs:
+        type: string
+      images:
+        type: string
+  pipeline:
+    type: object
+    required:
+      - start_period
+      - end_period
+      - time_interval
+      - granularity
+      - include_unemployment_node
+      - transition_metric
+      - max_working_age
+      - weight_column
+    properties:
+      start_period:
+        type: integer
+      end_period:
+        type: integer
+      time_interval:
+        type: integer
+      granularity:
+        type: integer
+        enum: [1, 2, 3, 4]
+      include_unemployment_node:
+        type: boolean
+      transition_metric:
+        type: string
+        enum: ["hidalgo", "row_stochastic"]
+      max_working_age:
+        type: integer
+      weight_column:
+        type: ["string", "null"]
+  simulation:
+    type: object
+    required:
+      - rate_fired
+      - rate_vacancies
+      - initial_employed_fraction
+      - seed
+      - n_steps
+    properties:
+      rate_fired:
+        type: number
+      rate_vacancies:
+        type: number
+      initial_employed_fraction:
+        type: number
+      seed:
+        type: integer
+      n_steps:
+        type: integer
+  datasets:
+    type: object
+    required:
+      - sipa
+    properties:
+      features:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+      sipa:
+        type: object
+        required:
+          - source
+        properties:
+          source:
+            type: string
+          url:
+            type: string
+          id_1:
+            type: string
+          id_2:
+            type: string
+          id_3:
+            type: string
+  translation:
+    type: object

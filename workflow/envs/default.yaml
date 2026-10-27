@@ -1,0 +1,18 @@
+name: labor_market_simulation
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - pandas>=2.0.0
+  - pyarrow>=14.0.0
+  - numpy>=1.24.0
+  - scipy>=1.10.0
+  - scikit-learn>=1.3.0
+  - matplotlib>=3.7.0
+  - seaborn>=0.12.0
+  - pip
+  - pip:
+      - mesa>=2.1.0
+      - python-dotenv>=1.0.0
+      - -e .
