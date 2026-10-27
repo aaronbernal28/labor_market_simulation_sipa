@@ -53,9 +53,9 @@ class TimeBatchPartitioner:
 		self._build()
 
 	def _build(self) -> None:
-		cursor = self.start
+		cursor: int = self.start
 		while cursor <= self.end:
-			batch_end = self._add_months(cursor, self.interval - 1)
+			batch_end: int = self._add_months(cursor, self.interval - 1)
 			batch_end = min(batch_end, self.end)
 			self._batches.append(TimeBatch(start=cursor, end=batch_end))
 			cursor = self._add_months(batch_end, 1)
@@ -63,6 +63,8 @@ class TimeBatchPartitioner:
 	@staticmethod
 	def _add_months(yyyymm: int, months: int) -> int:
 		"""Add ``months`` to a YYYYMM integer, handling year rollovers."""
+		year: int
+		month: int
 		year, month = divmod(yyyymm, 100)
 		month += months
 		year += (month - 1) // 12
@@ -77,7 +79,7 @@ class TimeBatchPartitioner:
 		"""Return batch identifiers suitable for Snakemake wildcards."""
 		return [b.batch_id for b in self._batches]
 
-	def consecutive_pairs(self) -> list[tuple]:
+	def consecutive_pairs(self) -> list[tuple[TimeBatch, TimeBatch]]:
 		"""
 		Return pairs of (batch_t, batch_t+1) for computing transitions.
 

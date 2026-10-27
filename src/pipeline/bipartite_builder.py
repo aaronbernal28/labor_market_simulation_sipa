@@ -10,6 +10,7 @@ gross remuneration (max rem_tot).
 from __future__ import annotations
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from scipy.sparse import csr_matrix
 
@@ -58,11 +59,13 @@ class BipartiteBuilder:
 		if self.df.empty:
 			return pd.DataFrame(columns=["id_trabajador", "sector", "pondera"])
 
-		work = self.df[["id_trabajador", "rem_tot", "fnacim", "pondera"]].copy()
+		work: pd.DataFrame = self.df[
+			["id_trabajador", "rem_tot", "fnacim", "pondera"]
+		].copy()
 		work["sector"] = sector_series.astype(str).values
 
-		obs_year = self.target_period // 100
-		age = obs_year - work["fnacim"]
+		obs_year: int = self.target_period // 100
+		age: pd.Series = obs_year - work["fnacim"]
 		work = work[age <= self.max_working_age].copy()
 
 		if work.empty:
@@ -72,18 +75,15 @@ class BipartiteBuilder:
 		work = work.sort_values(
 			by=["id_trabajador", "rem_tot"], ascending=[True, False]
 		)
-		primary = (
-			work.drop_duplicates(subset=["id_trabajador"], keep="first")[
-				["id_trabajador", "sector", "pondera"]
-			]
-			.reset_index(drop=True)
-		)
+		primary: pd.DataFrame = work.drop_duplicates(
+			subset=["id_trabajador"], keep="first"
+		)[["id_trabajador", "sector", "pondera"]].reset_index(drop=True)
 		return primary
 
 	@staticmethod
 	def to_sparse_bipartite(
 		states_df: pd.DataFrame,
-		worker_index: list | np.ndarray,
+		worker_index: list[int | str] | npt.NDArray[np.int64],
 		sector_labels: list[str],
 		weighted: bool = True,
 	) -> csr_matrix:
@@ -91,21 +91,21 @@ class BipartiteBuilder:
 		Construct a sparse (Workers x Sectors) CSR matrix aligned to
 		``worker_index`` and ``sector_labels``.
 		"""
-		n_workers = len(worker_index)
-		n_sectors = len(sector_labels)
+		n_workers: int = len(worker_index)
+		n_sectors: int = len(sector_labels)
 		if states_df.empty or n_workers == 0:
 			return csr_matrix((n_workers, n_sectors), dtype=np.float64)
 
-		w_map = pd.Series(np.arange(n_workers), index=worker_index)
-		s_map = {s: i for i, s in enumerate(sector_labels)}
+		w_map: pd.Series = pd.Series(np.arange(n_workers), index=worker_index)
+		s_map: dict[str, int] = {s: i for i, s in enumerate(sector_labels)}
 
-		valid = states_df[
+		valid: pd.DataFrame = states_df[
 			states_df["id_trabajador"].isin(w_map.index)
 			& states_df["sector"].isin(s_map)
 		]
-		rows = w_map.loc[valid["id_trabajador"]].values
-		cols = valid["sector"].map(s_map).values
-		vals = (
+		rows: np.ndarray = w_map.loc[valid["id_trabajador"]].values
+		cols: np.ndarray = valid["sector"].map(s_map).values
+		vals: np.ndarray = (
 			valid["pondera"].astype(np.float64).values
 			if weighted
 			else np.ones(len(valid), dtype=np.float64)

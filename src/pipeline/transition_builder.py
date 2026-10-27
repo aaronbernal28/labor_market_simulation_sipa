@@ -11,6 +11,7 @@ See docs/definitions.md for the full mathematical formulation.
 from __future__ import annotations
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 
 
@@ -60,9 +61,7 @@ class BipartiteToTransition:
 		).set_index("id_trabajador")
 
 		if all_sectors is None:
-			sectors_union = set(self.states_t.unique()) | set(
-				self.states_t1.unique()
-			)
+			sectors_union = set(self.states_t.unique()) | set(self.states_t1.unique())
 			sectors_union.discard(self.unemployed_label)
 			self.all_sectors = sorted(sectors_union, key=self._sector_sort_key)
 		else:
@@ -123,18 +122,18 @@ class BipartiteToTransition:
 		Compute the Hidalgo proximity matrix \\Phi_t:
 		\\phi_{t, s_i, s_j} = C_{t, s_i, s_j} / \\max( N_t(s_i), N_{t+1}(s_j) )
 		"""
-		C_df = self.compute_weighted_flows()
-		C = C_df.values.astype(np.float64)
+		C_df: pd.DataFrame = self.compute_weighted_flows()
+		C: npt.NDArray[np.float64] = C_df.values.astype(np.float64)
 
-		N_t = C.sum(axis=1)  # shape: (N+1,)
-		N_t1 = C.sum(axis=0)  # shape: (N+1,)
+		N_t: npt.NDArray[np.float64] = C.sum(axis=1)  # shape: (N+1,)
+		N_t1: npt.NDArray[np.float64] = C.sum(axis=0)  # shape: (N+1,)
 
-		D = np.maximum(N_t[:, np.newaxis], N_t1[np.newaxis, :])
+		D: npt.NDArray[np.float64] = np.maximum(N_t[:, np.newaxis], N_t1[np.newaxis, :])
 
 		with np.errstate(divide="ignore", invalid="ignore"):
-			Phi = np.where(D > 0.0, C / D, 0.0)
+			Phi: npt.NDArray[np.float64] = np.where(D > 0.0, C / D, 0.0)
 
-		res = pd.DataFrame(Phi, index=self.labels, columns=self.labels)
+		res: pd.DataFrame = pd.DataFrame(Phi, index=self.labels, columns=self.labels)
 		res.index.name = "sector_from"
 		res.columns.name = "sector_to"
 		return res
@@ -144,14 +143,14 @@ class BipartiteToTransition:
 		Compute the forward Markov transition probability matrix P_{t+1}(s_j | s_i):
 		T_{i, j} = C_{t, s_i, s_j} / N_t(s_i)
 		"""
-		C_df = self.compute_weighted_flows()
-		C = C_df.values.astype(np.float64)
-		row_sums = C.sum(axis=1, keepdims=True)
+		C_df: pd.DataFrame = self.compute_weighted_flows()
+		C: npt.NDArray[np.float64] = C_df.values.astype(np.float64)
+		row_sums: npt.NDArray[np.float64] = C.sum(axis=1, keepdims=True)
 
 		with np.errstate(divide="ignore", invalid="ignore"):
-			T = np.where(row_sums > 0.0, C / row_sums, 0.0)
+			T: npt.NDArray[np.float64] = np.where(row_sums > 0.0, C / row_sums, 0.0)
 
-		res = pd.DataFrame(T, index=self.labels, columns=self.labels)
+		res: pd.DataFrame = pd.DataFrame(T, index=self.labels, columns=self.labels)
 		res.index.name = "sector_from"
 		res.columns.name = "sector_to"
 		return res

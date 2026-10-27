@@ -9,11 +9,12 @@ sector-granularity level.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import ClassVar
 
 import pandas as pd
 
 # Mapping from granularity level -> column name.
-GRANULARITY_COLUMN = {
+GRANULARITY_COLUMN: dict[int, str] = {
 	1: "letra",
 	2: "r32",
 	3: "r32",  # truncated to first digit after load
@@ -33,7 +34,7 @@ class MLERLoader:
 	    (``data/processed/mler_parquet``).
 	"""
 
-	REQUIRED_COLS = [
+	REQUIRED_COLS: ClassVar[list[str]] = [
 		"id_trabajador",
 		"id_relacion",
 		"tiempo",
@@ -46,19 +47,19 @@ class MLERLoader:
 	]
 
 	def __init__(self, parquet_dir: str | Path):
-		self.parquet_dir = Path(parquet_dir)
+		self.parquet_dir: Path = Path(parquet_dir)
 
 	def load_period(self, target_period: int) -> pd.DataFrame:
 		"""
 		Load rows for a specific YYYYMM period (e.g., t_end = 199612)
 		using partition pruning and PyArrow pushdown filtering.
 		"""
-		year = target_period // 100
-		year_path = self.parquet_dir / f"year={year}"
+		year: int = target_period // 100
+		year_path: Path = self.parquet_dir / f"year={year}"
 		if not year_path.exists():
 			return pd.DataFrame(columns=self.REQUIRED_COLS)
 
-		df = pd.read_parquet(
+		df: pd.DataFrame = pd.read_parquet(
 			year_path,
 			filters=[("tiempo", "==", target_period)],
 			columns=self.REQUIRED_COLS,
@@ -70,13 +71,13 @@ class MLERLoader:
 		Return rows whose ``tiempo`` falls within [start, end] (YYYYMM).
 		Reads only the relevant year partitions.
 		"""
-		start_year = start // 100
-		end_year = end // 100
-		frames = []
+		start_year: int = start // 100
+		end_year: int = end // 100
+		frames: list[pd.DataFrame] = []
 		for year in range(start_year, end_year + 1):
-			year_path = self.parquet_dir / f"year={year}"
+			year_path: Path = self.parquet_dir / f"year={year}"
 			if year_path.exists():
-				part = pd.read_parquet(
+				part: pd.DataFrame = pd.read_parquet(
 					year_path,
 					filters=[("tiempo", ">=", start), ("tiempo", "<=", end)],
 					columns=self.REQUIRED_COLS,
@@ -99,8 +100,8 @@ class MLERLoader:
 				f"Unknown granularity {granularity}. "
 				f"Must be one of {list(GRANULARITY_COLUMN)}"
 			)
-		col = GRANULARITY_COLUMN[granularity]
-		series = df[col].astype(str)
+		col: str = GRANULARITY_COLUMN[granularity]
+		series: pd.Series = df[col].astype(str)
 		if granularity == 3:
 			series = series.str[:1]
 		return series

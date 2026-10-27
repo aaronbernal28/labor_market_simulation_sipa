@@ -45,17 +45,17 @@ class LaborMarketSimulation(mesa.Model):
 		initial_employed_fraction: float = 0.85,
 		n_steps: int = 120,
 		seed: int = 42,
-	):
+	) -> None:
 		super().__init__(seed=seed)
-		self.transition_series = transition_series or {}
-		self.rate_fired = rate_fired
-		self.rate_vacancies = rate_vacancies
-		self.initial_employed_fraction = initial_employed_fraction
-		self.n_steps = n_steps
-		self.running = True
-		self.current_step = 0
+		self.transition_series: dict[str, pd.DataFrame] = transition_series or {}
+		self.rate_fired: float = rate_fired
+		self.rate_vacancies: float = rate_vacancies
+		self.initial_employed_fraction: float = initial_employed_fraction
+		self.n_steps: int = n_steps
+		self.running: bool = True
+		self.current_step: int = 0
 
-	def step(self):
+	def step(self) -> None:
 		"""Single simulation tick. TODO: implement full ABM logic."""
 		self.current_step += 1
 		# TODO: apply transitions, firings, vacancy matching
