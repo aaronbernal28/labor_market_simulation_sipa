@@ -28,14 +28,15 @@ pipeline:
   # Weighting column (set to null to disable, or "pondera")
   weight_column: "pondera"
 
-# ── Simulation parameters (scaffold — TBD) ─────────────────────────────────────
+# ── Simulation parameters (Mesa 3.5.1 ABM) ─────────────────────────────────────
+# 1 step = 1 continuous batch (pipeline.time_interval months); steps = len(BATCHES).
 simulation:
-  rate_fired: 0.02                    # monthly probability of job loss
-  rate_vacancies: 0.03                # monthly vacancy opening rate
-  initial_employed_fraction: 0.85
+  n_agents: 10000                     # simulated worker population (fixed)
+  agent_sample_size: 100              # sample of agents tracked in agent trajectory CSV
+  exp_a_shock_fraction: 0.20          # Exp A: fraction of employed workers moved to unemployed
+  exp_b_target_sector: "auto"         # Exp B: sector code or "auto" = largest formal sector
+  exp_b_reduction_fraction: 0.50      # Exp B: contraction fraction of target sector
   seed: 42
-  n_steps: 120                        # simulation horizon in months
-  # Additional parameters TBD
 
 datasets:
   features:

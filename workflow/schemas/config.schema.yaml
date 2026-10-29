@@ -59,22 +59,32 @@ properties:
   simulation:
     type: object
     required:
-      - rate_fired
-      - rate_vacancies
-      - initial_employed_fraction
+      - n_agents
+      - agent_sample_size
+      - exp_a_shock_fraction
+      - exp_b_target_sector
+      - exp_b_reduction_fraction
       - seed
-      - n_steps
     properties:
-      rate_fired:
+      n_agents:
+        type: integer
+        minimum: 1
+      agent_sample_size:
+        type: integer
+        minimum: 1
+      exp_a_shock_fraction:
         type: number
-      rate_vacancies:
+        minimum: 0.0
+        maximum: 1.0
+      exp_b_target_sector:
+        type: string
+      exp_b_reduction_fraction:
         type: number
-      initial_employed_fraction:
-        type: number
+        minimum: 0.0
+        maximum: 1.0
       seed:
         type: integer
-      n_steps:
-        type: integer
+    additionalProperties: false
   datasets:
     type: object
     required:
