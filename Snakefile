@@ -68,3 +68,13 @@ rule all:
 			batch=BATCHES,
 			gran=GRANULARITY,
 		),
+		# Historical empirical series (Track 1)
+		expand(
+			"data/results/empirical_macro_series_g{gran}.csv",
+			gran=GRANULARITY,
+		),
+		# Mesa ABM simulation trajectories (Track 2)
+		expand(
+			"data/results/sim_g{gran}/macro_trajectory.csv",
+			gran=GRANULARITY,
+		),

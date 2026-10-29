@@ -40,3 +40,20 @@ rule export_transition_csv:
 		"../envs/default.yaml"
 	script:
 		"../../scripts/export_transition_csv.py"
+
+
+rule normalize_transition:
+	"""
+	Row-normalize a computed Hidalgo proximity matrix into fixed transition
+	probabilities (CSV) for agent random sampling in the Mesa ABM.
+	"""
+	input:
+		matrix="data/processed/{start}_{end}/transition_matrix_g{gran}.parquet",
+	output:
+		probs="data/processed/{start}_{end}/transition_probs_g{gran}.csv",
+	log:
+		"logs/transition/{start}_{end}_g{gran}_probs.log",
+	conda:
+		"../envs/default.yaml"
+	script:
+		"../../scripts/normalize_transition.py"
