@@ -42,7 +42,7 @@ class TimeBatchPartitioner:
 	--------
 	>>> p = TimeBatchPartitioner(start=199601, end=199812, interval=12)
 	>>> p.batch_ids()
-	['199601_199612', '199701_199812']
+	['199601_199701', '199701_199801', '199801_199812']
 	"""
 
 	def __init__(self, start: int, end: int, interval: int):
@@ -54,11 +54,10 @@ class TimeBatchPartitioner:
 
 	def _build(self) -> None:
 		cursor: int = self.start
-		while cursor <= self.end:
-			batch_end: int = self._add_months(cursor, self.interval - 1)
-			batch_end = min(batch_end, self.end)
+		while cursor < self.end:
+			batch_end: int = min(self._add_months(cursor, self.interval), self.end)
 			self._batches.append(TimeBatch(start=cursor, end=batch_end))
-			cursor = self._add_months(batch_end, 1)
+			cursor = batch_end
 
 	@staticmethod
 	def _add_months(yyyymm: int, months: int) -> int:
